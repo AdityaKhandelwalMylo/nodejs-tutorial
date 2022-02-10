@@ -1,4 +1,5 @@
 const express = require("express");
+const pathWrapper = require("./pathWrapper");
 const COURSES = require("./constants");
 
 const app = express();
