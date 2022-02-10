@@ -1,24 +1,27 @@
 const express = require("express");
+const COURSES = require("./constants");
 
 const app = express();
 
+const port = process.env.PORT || 4000;
+
 app.use(express.json());
 
-const courses = [
-  { id: 1, name: "Javascript" },
-  { id: 2, name: "ReactJS" },
-  { id: 3, name: "NodeJS" },
-  { id: 4, name: "MySQL" },
-  { id: 5, name: "MongoDB" },
-];
-
-app.get("/", async (req, res) => {
-  // console.log(req);
-  res.send("hello");
-});
+app.get(
+  "/",
+  async (req, res, next) => {
+    // console.log(req);
+    console.log("in middleware");
+    next();
+  },
+  async (req, res) => {
+    console.log("final function");
+    res.send("hello");
+  }
+);
 
 app.get("/api/courses", async (req, res) => {
-  res.status(200).json(courses);
+  res.status(200).json(COURSES);
 });
 
 app.post("/api/courses", async (req, res) => {
@@ -29,21 +32,22 @@ app.post("/api/courses", async (req, res) => {
       .status(400)
       .send("Name is required and should be minimum 3 characters");
 
-  const course = { id: courses.length + 1, name };
-  courses.push(course);
+  const course = { id: COURSES.length + 1, name };
+  COURSES.push(course);
 
   return res.status(200).json(course);
 });
 
 app.get("/api/courses/:id", async (req, res) => {
-  const resultCourse = courses.find((c) => c.id === parseInt(req.params.id));
+  const resultCourse = COURSES.find(
+    (course) => course.id === parseInt(req.params.id)
+  );
   if (!resultCourse)
-    res.status(404).send("The course with given ID was not found!!!");
+    res.status(400).send("The course with given ID was not found!!!");
   res.status(200).json(resultCourse);
 });
 
-const port = process.env.PORT || 4000;
-
 app.listen(port, () => {
+  // console.log(process);
   console.log(`Listening on port ${port}`);
 });
